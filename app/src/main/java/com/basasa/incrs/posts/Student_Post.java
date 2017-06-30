@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.basasa.incrs.Message.DataBaseHelper;
 import com.basasa.incrs.Message.MyCustomAdapter;
 import com.basasa.incrs.NDS.ChatThread;
+import com.basasa.incrs.NDS.DiscoveryThread;
 import com.basasa.incrs.R;
 import com.basasa.incrs.Recyclerview.DividerItemDecoration;
 import com.basasa.incrs.Recyclerview.RecyclerTouchListener;
@@ -117,13 +118,15 @@ public class Student_Post extends Fragment  {
         //dialog
         dataBaseHelper2=new DataBaseHelper(getContext());
 
+        Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
+        discoveryThread.start();
+
         //fetch();
         getDataFromDB1();
 
         DataBaseHelper dataBaseHelper=new DataBaseHelper(getContext());
         dataBaseHelper.fetch();
         threadconnection();
-
     }
 
     void DialogBox(){
