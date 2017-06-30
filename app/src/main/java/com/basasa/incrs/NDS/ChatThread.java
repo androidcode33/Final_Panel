@@ -13,7 +13,7 @@ import java.net.Socket;
  * Created by basasagerald on 4/14/2017.
  */
 
-public class ChatThread  {
+public class ChatThread  extends Thread{
     private static  int port;
     private static InetAddress host;
     PrintWriter out=null;
@@ -22,7 +22,9 @@ public class ChatThread  {
 
     private String serverMessage;
     private OnMessageReceived mMessageListener = null;
+public ChatThread(){
 
+}
     public static void setVariable(InetAddress dst,int port1){
         port= port1;
         host=dst;

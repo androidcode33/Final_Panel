@@ -1,7 +1,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
@@ -45,13 +45,38 @@
         <EditText
             android:id="@+id/questions"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:hint="Type message here"
             android:layout_marginBottom="4dp"
-            android:inputType="text|textMultiLine"
+            android:inputType="text"
             android:gravity="top"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_gravity="bottom">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cancel"
+        android:theme="@style/MyButton2"
+        android:text="CANCEL"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginLeft="35dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/save"
+        android:text="SAVE"
+        android:textColor="@color/white"
+        android:theme="@style/MyButton"
+        android:textStyle="bold"
+        android:layout_marginLeft="100dp"
+        />
 
+</LinearLayout>
     </LinearLayout>
 
 </ScrollView>

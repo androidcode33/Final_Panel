@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -131,27 +132,29 @@ public class Student_Post extends Fragment  {
 
     void DialogBox(){
         new connectTask().execute("");
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.add_question_dialog, null);
         final EditText question = (EditText) dialogView.findViewById(R.id.questions);
         final ListView mList =(ListView)dialogView.findViewById(R.id.list_questions);
-
+        final Button btnCancel=(Button)dialogView.findViewById(R.id.cancel);
+        final Button btnSave=(Button)dialogView.findViewById(R.id.save);
         arrayList = new ArrayList<String>();
         adapter = new MyCustomAdapter(getContext(), arrayList);
-
+        builder.setCancelable(false);
         mList.setAdapter(adapter);
         builder.setView(dialogView);
-        builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+
+           }
+       });
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-             sendMessage(question.getText().toString().trim());
-            }
-        });
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onClick(View v) {
+                sendMessage(question.getText().toString().trim());
+                question.setText("");
             }
         });
         builder.create();
@@ -186,29 +189,26 @@ public class Student_Post extends Fragment  {
         if (messageToSave.contains("ENTER")|| messageToSave.contains("/")|| messageToSave.startsWith("*")){
             return;
         }
-        else if(messageToSave.trim().startsWith("Lecturer")) {
-            if (messageToSave.contains("-")){
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper2.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"C","lecturer");
+        else if(messageToSave.trim().contains("Lecturer")) {
+            if (messageToSave.contains(">>")){
+                String [] saveMessage=messageToSave.split(">>");
+                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"C","lecturer",saveMessage[3]);
 
             }else{
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper2.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","lecturer");
+                String [] saveMessage=messageToSave.split(">>");
+                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O","lecturer","");
             }
         }
-        else {
-            if (messageToSave.contains("#")){
-                String [] saveMessage=messageToSave.split(":");
-                String QandA =saveMessage[saveMessage.length-1].trim();
-                String [] Response= QandA.split("#");
-                dataBaseHelper2.insertresponseIntoDB(1, Response[Response.length-1].trim());
+        else  if (messageToSave.contains("#")){
+            String [] saveMessage=messageToSave.split("#");
+            dataBaseHelper2.insertresponseIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[1].trim(),"");
+           }
+        else if (messageToSave.contains(">>")){
+            String [] saveMessage=messageToSave.split(">>");
 
-            }else {
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper2.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","student");
-            }
-
+            dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O",saveMessage[1]," ");
         }
+
     }
     public class connectTask extends AsyncTask<String,String,ChatThread> {
 
@@ -240,8 +240,6 @@ public class Student_Post extends Fragment  {
         }
     }
     public void sendMessage(String message){
-
-
         //add the text in the arrayList
         //arrayList.add("c: " + message);
 
@@ -310,12 +308,12 @@ public class Student_Post extends Fragment  {
     public void getDataFromDB1(){
         postList.clear();
         String sender ="student";
-        String query = "select ID, messages from message where Sender='"+sender+"';";
+        String query = "select MessageID, messages from message where Sender='"+sender+"';";
         String count=("SELECT COUNT(ID) from responses");
         storeData = getContext().openOrCreateDatabase("MessageDB",MODE_PRIVATE,null);
         try {
-            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT, messages TEXT,  Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT CHECK(Sender IN('student','lecturer')) NOT NULL DEFAULT 'student');");
-            storeData.execSQL("CREATE TABLE IF NOT EXISTS responses(  ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, Responses TEXT);");
+            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT, Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT);");
+            storeData.execSQL("CREATE TABLE IF NOT EXISTS responses(  ID INTEGER PRIMARY KEY AUTOINCREMENT, MessageID INTEGER, Responses TEXT, respondent TEXT);");
             Cursor cursor = storeData.rawQuery(query, null);
             Cursor counter = storeData.rawQuery(count, null);
             cursor.moveToFirst();

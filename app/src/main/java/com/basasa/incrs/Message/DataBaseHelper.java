@@ -23,8 +23,8 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 1;
     private static final String STUDENT_TABLE = "message";
     private static final String RESPONSE = "responses";
-    private static final String STU_TABLE = "CREATE TABLE IF NOT EXISTS "+STUDENT_TABLE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT, messages TEXT,  Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT CHECK(Sender IN('student','lecturer')) NOT NULL DEFAULT 'student')";
-    private static final String RESPONSES = "CREATE TABLE IF NOT EXISTS "+RESPONSE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, Responses TEXT)";
+    private static final String STU_TABLE = "CREATE TABLE IF NOT EXISTS "+STUDENT_TABLE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT,  Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT)";
+    private static final String RESPONSES = "CREATE TABLE IF NOT EXISTS "+RESPONSE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, Responses TEXT,respondent TEXT)";
 
     Context context;
 
@@ -59,7 +59,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         }
 
     }
-public void insertresponseIntoDB(int id, String response){
+public void insertresponseIntoDB(int id, String response,String respondent){
 
     // 1. get reference to writable DB
     SQLiteDatabase db2 = this.getWritableDatabase();
@@ -68,7 +68,7 @@ public void insertresponseIntoDB(int id, String response){
     ContentValues values = new ContentValues();
     values.put("MessageID", id);
     values.put("Responses", response);
-
+    values.put("respondent", respondent);
     // 3. insert
     db2.insert(RESPONSE, null, values);
     // 4. close
@@ -77,7 +77,7 @@ public void insertresponseIntoDB(int id, String response){
 
 }
     /* Insert into database*/
-    public void insertIntoDB(String messagesent, String  type, String sender){
+    public void insertIntoDB(int id, String messagesent, String  type, String sender,String options){
         Log.d("insert", "before insert");
 
         // 1. get reference to writable DB

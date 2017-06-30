@@ -28,7 +28,7 @@ public class DiscoveryThread implements Runnable {
 
             //Try the 255.255.255.255 first
             try {
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 8888);
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 2222);
                 c.send(sendPacket);
                 System.out.println(getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
             } catch (Exception e) {
@@ -51,7 +51,7 @@ public class DiscoveryThread implements Runnable {
 
                     // Send the broadcast package!
                     try {
-                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 8888);
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, broadcast, 2222);
                         c.send(sendPacket);
                     } catch (Exception e) {
                     }
@@ -76,6 +76,9 @@ public class DiscoveryThread implements Runnable {
                 //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
                 //Controller_Base.setServerIp(receivePacket.getAddress());
                 System.out.print("The Server's Ip :"+receivePacket.getAddress());
+                ChatThread sendMessageTask = new ChatThread();
+                sendMessageTask.setVariable(receivePacket.getAddress(),receivePacket.getPort());
+                sendMessageTask.run();
             }
 
             //Close the port!
