@@ -50,32 +50,32 @@ public class Post_Question extends AppCompatActivity {
 
     }
     public void StoreDb(String messageToSave){
-        if (messageToSave.contains("ENTER")|| messageToSave.contains("/")|| messageToSave.startsWith("*")){
-            return;
-        }
-        else if(messageToSave.trim().startsWith("Lecturer")) {
-            if (messageToSave.contains("-")){
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"C","lecturer");
-
-            }else{
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","lecturer");
-            }
-        }
-        else {
-            if (messageToSave.contains("#")){
-                String [] saveMessage=messageToSave.split(":");
-                String QandA =saveMessage[saveMessage.length-1].trim();
-                String [] Response= QandA.split("#");
-                dataBaseHelper.insertresponseIntoDB(1, Response[Response.length-1].trim());
-
-            }else {
-                String [] saveMessage=messageToSave.split(":");
-                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","student");
-            }
-
-        }
+//        if (messageToSave.contains("ENTER")|| messageToSave.contains("/")|| messageToSave.startsWith("*")){
+//            return;
+//        }
+//        else if(messageToSave.trim().startsWith("Lecturer")) {
+//            if (messageToSave.contains("-")){
+//                String [] saveMessage=messageToSave.split(":");
+//                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"C","lecturer");
+//
+//            }else{
+//                String [] saveMessage=messageToSave.split(":");
+//                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","lecturer");
+//            }
+//        }
+//        else {
+//            if (messageToSave.contains("#")){
+//                String [] saveMessage=messageToSave.split(":");
+//                String QandA =saveMessage[saveMessage.length-1].trim();
+//                String [] Response= QandA.split("#");
+//                dataBaseHelper.insertresponseIntoDB(1, Response[Response.length-1].trim());
+//
+//            }else {
+//                String [] saveMessage=messageToSave.split(":");
+//                dataBaseHelper.insertIntoDB(saveMessage[saveMessage.length-1].trim(),"O","student");
+//            }
+//
+//        }
     }
     public class connectTask extends AsyncTask<String,String,ChatThread> {
 

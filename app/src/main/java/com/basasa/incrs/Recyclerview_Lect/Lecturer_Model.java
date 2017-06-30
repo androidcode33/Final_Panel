@@ -11,6 +11,15 @@ public class Lecturer_Model {
     private String response;
     private int count;
 
+    public String getType() {
+        return Type;
+    }
+
+    public void setType(String type) {
+        Type = type;
+    }
+
+    private String Type;
     public String getResponse() {
         return response;
     }

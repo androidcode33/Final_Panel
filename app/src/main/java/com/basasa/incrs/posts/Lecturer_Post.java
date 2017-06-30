@@ -1,15 +1,22 @@
 package com.basasa.incrs.posts;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.basasa.incrs.R;
@@ -21,6 +28,8 @@ import com.basasa.incrs.Recyclerview_Lect.Lecturer_PostAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by basasagerald on 2/28/2017.
  */
@@ -30,7 +39,7 @@ public class Lecturer_Post extends Fragment {
     private List<Lecturer_Model> postList = new ArrayList<>();
     private RecyclerView recyclerView;
     private Lecturer_PostAdapter mAdapter;
-
+    private SQLiteDatabase storeData;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,51 +64,73 @@ public class Lecturer_Post extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 Lecturer_Model post = postList.get(position);
-                if (post.equals(0)){
-
-                }
+                DialogBoxAnswer(post.getId(),post.getQuestion());
             }
 
             @Override
             public void onLongClick(View view, int position) {
                 Lecturer_Model post = postList.get(position);
-                Toast.makeText(getActivity(), post.getQuestion() + " is selected!", Toast.LENGTH_SHORT).show();
+                
             }
         }));
 
-        //preparePostData();
+        getDataFromDB1();
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDataFromDB1();
 
-//    private void preparePostData() {
-//        Lecturer_Model post = new Lecturer_Model("Health", "best description");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("understood", "i have not understood that point 1");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("last slide", "what does deny mean?");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("tired", "its some students are tired");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("feeed back", "feed back on our project");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("deadline", "When is the deadline for course work");
-//        postList.add(post);
-//
-//
-//
-//        post = new Lecturer_Model("security", "i have not understood that");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("last slide", "how to hack");
-//        postList.add(post);
-//
-//        post = new Lecturer_Model("papers", "Our test question papers");
-//        postList.add(post);
-//
-//        mAdapter.notifyDataSetChanged();
-//    }
+    }
+    public void getDataFromDB1(){
+        postList.clear();
+        String sender ="lecturer";
+        String query = "select MessageID, messages,Type from message where Sender='"+sender+"';";
+        String count=("SELECT COUNT(ID) from responses");
+        storeData = getContext().openOrCreateDatabase("MessageDB",MODE_PRIVATE,null);
+        try {
+           Cursor cursor = storeData.rawQuery(query, null);
+            Cursor counter = storeData.rawQuery(count, null);
+            cursor.moveToFirst();
+            do {
+                Lecturer_Model model = new Lecturer_Model();
+                model.setId(cursor.getInt(0));
+                model.setQuestion(cursor.getString(1));
+                model.setType(cursor.getString(2));
+                postList.add(model);
+            } while (cursor.moveToNext());
+
+        }catch (Exception e){
+            System.out.println(e);
+
+        }
+        mAdapter.notifyDataSetChanged();
+        Log.d("message data", postList.toString());
+
+    }
+    void DialogBoxAnswer( final int id, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.answer_posts_dialog, null);
+        final EditText question = (EditText) dialogView.findViewById(R.id.questions);
+        final LinearLayout open = (LinearLayout) dialogView.findViewById(R.id.openended);
+        final LinearLayout footer = (LinearLayout) dialogView.findViewById(R.id.footer);
+        footer.setVisibility(View.INVISIBLE);
+        open.setVisibility(View.VISIBLE);
+        builder.setView(dialogView);
+        builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create();
+        builder.show();
+    }
 }

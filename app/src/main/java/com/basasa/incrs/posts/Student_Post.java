@@ -147,7 +147,7 @@ public class Student_Post extends Fragment  {
         btnCancel.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-
+           sendMessage(question.getText().toString().trim());
            }
        });
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -161,19 +161,20 @@ public class Student_Post extends Fragment  {
         builder.show();
     }
 
-    void DialogBoxAnswer(int id, String message){
+    void DialogBoxAnswer( final int id, String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.answer_posts_dialog, null);
         final EditText question = (EditText) dialogView.findViewById(R.id.questions);
         final LinearLayout open = (LinearLayout) dialogView.findViewById(R.id.openended);
         final LinearLayout footer = (LinearLayout) dialogView.findViewById(R.id.footer);
-
+        footer.setVisibility(View.INVISIBLE);
+        open.setVisibility(View.VISIBLE);
         builder.setView(dialogView);
         builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                sendMessage(question.getText().toString().trim());
+              sendMsg(id+"#"+question.getText().toString().trim());
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -192,11 +193,11 @@ public class Student_Post extends Fragment  {
         else if(messageToSave.trim().contains("Lecturer")) {
             if (messageToSave.contains(">>")){
                 String [] saveMessage=messageToSave.split(">>");
-                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"C","lecturer",saveMessage[3]);
+                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"C","lecturer",saveMessage[3],"lecturer");
 
             }else{
                 String [] saveMessage=messageToSave.split(">>");
-                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O","lecturer","");
+                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O","lecturer","","lecturer");
             }
         }
         else  if (messageToSave.contains("#")){
@@ -206,7 +207,7 @@ public class Student_Post extends Fragment  {
         else if (messageToSave.contains(">>")){
             String [] saveMessage=messageToSave.split(">>");
 
-            dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O",saveMessage[1]," ");
+            dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O",saveMessage[1]," ","student");
         }
 
     }
@@ -237,6 +238,15 @@ public class Student_Post extends Fragment  {
             // notify the adapter that the data set has changed. This means that new message received
             // from server was added to the list
             mAdapter.notifyDataSetChanged();
+        }
+    }
+    public void sendMsg(String message){
+        //add the text in the arrayList
+        //arrayList.add("c: " + message);
+
+        //sends the message to the server
+        if (chat != null) {
+            chat.sendMsg(message);
         }
     }
     public void sendMessage(String message){
@@ -312,7 +322,7 @@ public class Student_Post extends Fragment  {
         String count=("SELECT COUNT(ID) from responses");
         storeData = getContext().openOrCreateDatabase("MessageDB",MODE_PRIVATE,null);
         try {
-            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT, Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT);");
+            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT, Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT,,Sending TEXT);");
             storeData.execSQL("CREATE TABLE IF NOT EXISTS responses(  ID INTEGER PRIMARY KEY AUTOINCREMENT, MessageID INTEGER, Responses TEXT, respondent TEXT);");
             Cursor cursor = storeData.rawQuery(query, null);
             Cursor counter = storeData.rawQuery(count, null);

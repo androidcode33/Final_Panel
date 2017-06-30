@@ -46,7 +46,7 @@ public class Lecturer_PostAdapter extends RecyclerView.Adapter<Lecturer_PostAdap
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Lecturer_Model post = postsList.get(position);
         holder.question.setText(post.getQuestion());
-        holder.answer.setText("Answer");
+        holder.answer.setText(post.getType());
 
         if(post.getQuestion().startsWith("a") || post.getQuestion().startsWith("A"))
             holder.postIcon.setImageResource(R.mipmap.a);

@@ -23,7 +23,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 1;
     private static final String STUDENT_TABLE = "message";
     private static final String RESPONSE = "responses";
-    private static final String STU_TABLE = "CREATE TABLE IF NOT EXISTS "+STUDENT_TABLE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT,  Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT)";
+    private static final String STU_TABLE = "CREATE TABLE IF NOT EXISTS "+STUDENT_TABLE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT,  Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT,Sending TEXT)";
     private static final String RESPONSES = "CREATE TABLE IF NOT EXISTS "+RESPONSE +"(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, Responses TEXT,respondent TEXT)";
 
     Context context;
@@ -77,7 +77,7 @@ public void insertresponseIntoDB(int id, String response,String respondent){
 
 }
     /* Insert into database*/
-    public void insertIntoDB(int id, String messagesent, String  type, String sender,String options){
+    public void insertIntoDB(int id, String messagesent, String  type, String sender,String options, String sending){
         Log.d("insert", "before insert");
 
         // 1. get reference to writable DB
@@ -88,7 +88,8 @@ public void insertresponseIntoDB(int id, String response,String respondent){
         values.put("messages", messagesent);
         values.put("Type", type);
         values.put("Sender", sender);
-
+        values.put("Options", options);
+        values.put("Sending", sending);
         // 3. insert
         db.insert(STUDENT_TABLE, null, values);
         // 4. close
