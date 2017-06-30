@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.basasa.incrs.AnswerView.View_Post_Answers;
 import com.basasa.incrs.R;
 import com.basasa.incrs.Recyclerview.DividerItemDecoration;
 import com.basasa.incrs.Recyclerview.RecyclerTouchListener;
@@ -70,7 +71,10 @@ public class Lecturer_Post extends Fragment {
             @Override
             public void onLongClick(View view, int position) {
                 Lecturer_Model post = postList.get(position);
-                
+                Intent intent=new Intent(getActivity(), View_Post_Answers.class);
+                intent.putExtra("message", post.getQuestion());
+                intent.putExtra("id",post.getId());
+                startActivity(intent);
             }
         }));
 

@@ -9,18 +9,20 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Answrs To Question"
-        android:layout_marginTop="8dp"/>
+        android:text="ANSWERS TO QUESTION"
+        android:layout_marginLeft="80dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="question"
-        android:id="@+id/qn"
-        android:layout_marginTop="10dp"/>
-<ListView
+        android:id="@+id/questionz"
+        android:layout_marginTop="8dp"/>
+
+<android.support.v7.widget.RecyclerView
+    android:layout_marginTop="20dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/answers">
 
-</ListView>
+</android.support.v7.widget.RecyclerView>
+
 </LinearLayout>

@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.basasa.incrs.AnswerView.View_Post_Answers;
 import com.basasa.incrs.Message.DataBaseHelper;
 import com.basasa.incrs.Message.MyCustomAdapter;
 import com.basasa.incrs.NDS.ChatThread;
@@ -67,6 +68,7 @@ public class Student_Post extends Fragment  {
     private ChatThread chat;
     //ProgressDialog dialog=null;
     private static final int REQUEST_CODE = 1;
+    Handler mHandler = new Handler();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,6 +116,11 @@ public class Student_Post extends Fragment  {
             @Override
             public void onLongClick(View view, int position) {
                 Student_Model post = postList.get(position);
+
+                Intent intent=new Intent(getActivity(), View_Post_Answers.class);
+                intent.putExtra("message", post.getQuestion());
+                intent.putExtra("id",post.getId());
+                startActivity(intent);
             }
         }));
         //dialog
@@ -128,6 +135,29 @@ public class Student_Post extends Fragment  {
         DataBaseHelper dataBaseHelper=new DataBaseHelper(getContext());
         dataBaseHelper.fetch();
         threadconnection();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                while (true) {
+                    try {
+                        Thread.sleep(10000);
+                        mHandler.post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                // Write your code here to update the UI.
+                             new connectTask2().execute("");
+                            }
+                        });
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                    }
+                }
+            }
+        }).start();
     }
 
     void DialogBox(){
@@ -240,6 +270,27 @@ public class Student_Post extends Fragment  {
             mAdapter.notifyDataSetChanged();
         }
     }
+
+    public class connectTask2 extends AsyncTask<String,String,ChatThread> {
+
+        @Override
+        protected ChatThread doInBackground(String... message) {
+
+            //we create a chatclient object and
+            chat = new ChatThread(new ChatThread.OnMessageReceived() {
+                @Override
+                //here the messageReceived method is implemented
+                public void messageReceived(String message) {
+                    //this method calls the onProgressUpdate
+                    StoreDb(message);
+                }
+            });
+            chat.run();
+
+            return null;
+        }
+    }
+
     public void sendMsg(String message){
         //add the text in the arrayList
         //arrayList.add("c: " + message);
@@ -268,7 +319,7 @@ public class Student_Post extends Fragment  {
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
        // mWifi.isConnected()
         if (check==1) {
-          t.run();
+
 //            asyc= new MyAsyncTask();
 //            asyc.execute();
 
@@ -279,30 +330,7 @@ public class Student_Post extends Fragment  {
         }
 
     }
-    final Handler h = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            if(msg.what == 0){
-                System.out.print("yeeeeeeeeeeeeeeeeeeeeeeeees");
-            }else{
-                System.out.print("errooooo");
-            }
-        }
-    };
 
-    Thread t = new Thread() {
-        @Override
-        public void run(){
-
-            boolean succeed=false;
-            if(succeed){
-                //we can't update the UI from here so we'll signal our handler and it will do it for us.
-                h.sendEmptyMessage(0);
-            }else{
-                h.sendEmptyMessage(1);
-            }
-        }
-    };
     @Override
     public void onResume() {
         super.onResume();
