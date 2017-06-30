@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/main_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:textSize="20dp"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:text="Lecturer posts list"
+            android:id="@+id/text"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/lecturer_posts"
+            android:layout_below="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:paddingTop="5dp"/>
+
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,56 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/flyer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Answers To Question"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/q"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:text="question"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="1">
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/listanswers">
+                
+            </ListView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.9dp"
+            android:background="#000000"/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/file_shared"
+        android:orderInCategory="1"
+        android:title="FILE"
+        android:icon="@drawable/ic_file_download_white_24dp"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/online_users"
+        android:orderInCategory="1"
+        android:title="ONLINE USER"
+        android:icon="@drawable/ic_perm_identity_white_18dp"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/help"
+        android:orderInCategory="1"
+        android:title="HELP"
+        android:icon="@drawable/ic_live_help_white_18dp"
+        app:showAsAction="always"/>
+</menu>
