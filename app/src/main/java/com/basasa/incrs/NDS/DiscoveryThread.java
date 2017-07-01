@@ -76,7 +76,7 @@ public class DiscoveryThread implements Runnable {
                 //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
                 //Controller_Base.setServerIp(receivePacket.getAddress());
                 System.out.print("The Server's Ip :"+receivePacket.getAddress());
-                ChatThread sendMessageTask = new ChatThread();
+                    ChatThread sendMessageTask = new ChatThread();
                 sendMessageTask.setVariable(receivePacket.getAddress(),receivePacket.getPort());
                 sendMessageTask.run();
             }

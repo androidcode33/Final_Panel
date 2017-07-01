@@ -149,7 +149,7 @@ public class Student_Post extends Fragment  {
                             public void run() {
                                 // TODO Auto-generated method stub
                                 // Write your code here to update the UI.
-                             new connectTask2().execute("");
+                             //new connectTask2().execute("");
                             }
                         });
                     } catch (Exception e) {
@@ -171,7 +171,7 @@ public class Student_Post extends Fragment  {
         final Button btnSave=(Button)dialogView.findViewById(R.id.save);
         arrayList = new ArrayList<String>();
         adapter = new MyCustomAdapter(getContext(), arrayList);
-        builder.setCancelable(false);
+        //builder.setCancelable(false);
         mList.setAdapter(adapter);
         builder.setView(dialogView);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -196,11 +196,13 @@ public class Student_Post extends Fragment  {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.answer_posts_dialog, null);
         final EditText question = (EditText) dialogView.findViewById(R.id.questions);
+        final TextView d=(TextView)dialogView.findViewById(R.id.question);
         final LinearLayout open = (LinearLayout) dialogView.findViewById(R.id.openended);
         final LinearLayout footer = (LinearLayout) dialogView.findViewById(R.id.footer);
         footer.setVisibility(View.INVISIBLE);
         open.setVisibility(View.VISIBLE);
         builder.setView(dialogView);
+        d.setText(message);
         builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -217,29 +219,29 @@ public class Student_Post extends Fragment  {
         builder.show();
     }
     public void StoreDb(String messageToSave){
-        if (messageToSave.contains("ENTER")|| messageToSave.contains("/")|| messageToSave.startsWith("*")){
-            return;
-        }
-        else if(messageToSave.trim().contains("Lecturer")) {
-            if (messageToSave.contains(">>")){
-                String [] saveMessage=messageToSave.split(">>");
-                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"C","lecturer",saveMessage[3],"lecturer");
+        try {
+            if (messageToSave.contains("ENTER") || messageToSave.contains("/") || messageToSave.startsWith("*")) {
+                return;
+            } else if (messageToSave.trim().contains("Lecturer")) {
+                if (messageToSave.contains(">>")&& messageToSave.contains("-")) {
+                    String[] saveMessage = messageToSave.split(">>");
+                    dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[2].trim(), "C", "lecturer", saveMessage[3], "lecturer");
 
-            }else{
-                String [] saveMessage=messageToSave.split(">>");
-                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O","lecturer","","lecturer");
+                } else {
+                    String[] saveMessage = messageToSave.split(">>");
+                    dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[2].trim(), "O", "lecturer", "", "lecturer");
+                }
+            } else if (messageToSave.contains("#")) {
+                String[] saveMessage = messageToSave.split("#");
+                dataBaseHelper2.insertresponseIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[1].trim(), "");
+            } else if (messageToSave.contains(">>")) {
+                String[] saveMessage = messageToSave.split(">>");
+
+                dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[2].trim(), "O", saveMessage[1], " ", "student");
             }
+        }catch (Exception ex){
+            ex.getLocalizedMessage();
         }
-        else  if (messageToSave.contains("#")){
-            String [] saveMessage=messageToSave.split("#");
-            dataBaseHelper2.insertresponseIntoDB(Integer.parseInt(saveMessage[0]), saveMessage[1].trim(),"");
-           }
-        else if (messageToSave.contains(">>")){
-            String [] saveMessage=messageToSave.split(">>");
-
-            dataBaseHelper2.insertIntoDB(Integer.parseInt(saveMessage[0]),saveMessage[2],"O",saveMessage[1]," ","student");
-        }
-
     }
     public class connectTask extends AsyncTask<String,String,ChatThread> {
 
@@ -271,25 +273,25 @@ public class Student_Post extends Fragment  {
         }
     }
 
-    public class connectTask2 extends AsyncTask<String,String,ChatThread> {
-
-        @Override
-        protected ChatThread doInBackground(String... message) {
-
-            //we create a chatclient object and
-            chat = new ChatThread(new ChatThread.OnMessageReceived() {
-                @Override
-                //here the messageReceived method is implemented
-                public void messageReceived(String message) {
-                    //this method calls the onProgressUpdate
-                    StoreDb(message);
-                }
-            });
-            chat.run();
-
-            return null;
-        }
-    }
+//    public class connectTask2 extends AsyncTask<String,String,ChatThread> {
+//
+//        @Override
+//        protected ChatThread doInBackground(String... message) {
+//
+//            //we create a chatclient object and
+//            chat = new ChatThread(new ChatThread.OnMessageReceived() {
+//                @Override
+//                //here the messageReceived method is implemented
+//                public void messageReceived(String message) {
+//                    //this method calls the onProgressUpdate
+//                    StoreDb(message);
+//                }
+//            });
+//            chat.run();
+//
+//            return null;
+//        }
+//    }
 
     public void sendMsg(String message){
         //add the text in the arrayList
@@ -346,11 +348,11 @@ public class Student_Post extends Fragment  {
     public void getDataFromDB1(){
         postList.clear();
         String sender ="student";
-        String query = "select MessageID, messages from message where Sender='"+sender+"';";
+        String query = "select MessageID, messages from message where Sending='"+sender+"';";
         String count=("SELECT COUNT(ID) from responses");
         storeData = getContext().openOrCreateDatabase("MessageDB",MODE_PRIVATE,null);
         try {
-            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT, Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT,,Sending TEXT);");
+            storeData.execSQL("CREATE TABLE IF NOT EXISTS message(ID INTEGER PRIMARY KEY AUTOINCREMENT,MessageID INTEGER, messages TEXT, Options TEXT, Type TEXT CHECK(Type IN('O','C')) NOT NULL DEFAULT 'O', Sender TEXT,Sending TEXT);");
             storeData.execSQL("CREATE TABLE IF NOT EXISTS responses(  ID INTEGER PRIMARY KEY AUTOINCREMENT, MessageID INTEGER, Responses TEXT, respondent TEXT);");
             Cursor cursor = storeData.rawQuery(query, null);
             Cursor counter = storeData.rawQuery(count, null);

@@ -53,7 +53,7 @@ public class Student_PostAdapter extends RecyclerView.Adapter<Student_PostAdapte
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Student_Model post = postsList.get(position);
         holder.question.setText(post.getQuestion());
-        holder.feedback.setText("feedback");
+        holder.feedback.setText("0");
 
         if(post.getQuestion().startsWith("a") || post.getQuestion().startsWith("A"))
             holder.postIcon.setImageResource(R.mipmap.a);

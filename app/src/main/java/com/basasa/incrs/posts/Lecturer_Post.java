@@ -17,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.basasa.incrs.AnswerView.View_Post_Answers;
@@ -35,12 +38,14 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by basasagerald on 2/28/2017.
  */
 
-public class Lecturer_Post extends Fragment {
+public class Lecturer_Post extends Fragment implements View.OnClickListener{
 
     private List<Lecturer_Model> postList = new ArrayList<>();
     private RecyclerView recyclerView;
     private Lecturer_PostAdapter mAdapter;
     private SQLiteDatabase storeData;
+    String s;
+    int x;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -116,16 +121,68 @@ public class Lecturer_Post extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.answer_posts_dialog, null);
+        final TextView textView=(TextView)dialogView.findViewById(R.id.question);
         final EditText question = (EditText) dialogView.findViewById(R.id.questions);
         final LinearLayout open = (LinearLayout) dialogView.findViewById(R.id.openended);
         final LinearLayout footer = (LinearLayout) dialogView.findViewById(R.id.footer);
         footer.setVisibility(View.INVISIBLE);
         open.setVisibility(View.VISIBLE);
         builder.setView(dialogView);
+        textView.setText(message);
+        String query = "select  Options,Type from message where MessageID='"+id+"';";
+
+        SQLiteDatabase db = getContext().openOrCreateDatabase("MessageDB",MODE_PRIVATE,null);
+        try {
+            Cursor cursor = db.rawQuery(query,null);
+            cursor.moveToFirst();
+            do {
+               // int idz=cursor.getInt(0);
+                String q =cursor.getString(0);
+                String questiontype=cursor.getString(1);
+
+                if (questiontype=="O"){
+                    x=1;
+                    footer.setVisibility(View.INVISIBLE);
+                }else {
+                    open.setVisibility(View.INVISIBLE);
+                    x=2;
+                }
+                if (q.contains("-")){
+
+                    RadioGroup rgp = (RadioGroup)dialogView. findViewById(R.id.radio_group);
+                    rgp.setOrientation(LinearLayout.VERTICAL);
+                    //String message="question#option1@option2@option3@option4@option5@option6";
+                    String [] optionz=q.split("-");
+
+                    for (int i = 0; i <= optionz.length; i++) {
+                        RadioButton rbn = new RadioButton(getContext());
+                        rbn.setId(i + 1000);
+                        rbn.setText(optionz [optionz.length-i]);
+                        rbn.setOnClickListener(this);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT, 1f);
+                        rbn.setLayoutParams(params);
+                        rgp.addView(rbn);
+                    }
+
+                }else {
+                    System.out.println("open ended question");
+                }
+
+            }while (cursor.moveToNext());
+        }catch (Exception e){
+            System.out.println(e);
+        }
         builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Student_Post student_post=new Student_Post();
+            if (x==1){
 
+                student_post.sendMsg(id+"#"+question.getText().toString().trim());
+            }
+            else if (x==2){
+                student_post.sendMsg(id+"#"+s);
+            }
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -136,5 +193,15 @@ public class Lecturer_Post extends Fragment {
         });
         builder.create();
         builder.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        try {
+            s = ((RadioButton) v).getText().toString();
+        }
+        catch (Exception e1) {
+            e1.printStackTrace();
+        }
     }
 }
