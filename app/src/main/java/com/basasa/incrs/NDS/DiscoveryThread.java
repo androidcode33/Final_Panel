@@ -1,5 +1,8 @@
 package com.basasa.incrs.NDS;
 
+import com.basasa.incrs.Other.fileThread;
+import com.basasa.incrs.posts.Student_Post;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,6 +19,9 @@ import java.util.logging.Logger;
 
 public class DiscoveryThread implements Runnable {
     DatagramSocket c;
+    Client client;
+    InetAddress ip;
+    int port;
     @Override
     public void run() {
 // Find the server using UDP broadcast
@@ -76,9 +82,16 @@ public class DiscoveryThread implements Runnable {
                 //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
                 //Controller_Base.setServerIp(receivePacket.getAddress());
                 System.out.print("The Server's Ip :"+receivePacket.getAddress());
-                    ChatThread sendMessageTask = new ChatThread();
-                sendMessageTask.setVariable(receivePacket.getAddress(),receivePacket.getPort());
-                sendMessageTask.run();
+//                    ChatThread sendMessageTask = new ChatThread();
+//                sendMessageTask.setVariable(receivePacket.getAddress(),receivePacket.getPort());
+//                sendMessageTask.run();
+
+//                client=new Client(receivePacket.getAddress(),receivePacket.getPort());
+//                client.connection();
+                ip=receivePacket.getAddress();
+                port=receivePacket.getPort();
+                SreviceClass.setVariable(receivePacket.getAddress(),receivePacket.getPort());
+                fileThread.setVariable(receivePacket.getAddress());
             }
 
             //Close the port!

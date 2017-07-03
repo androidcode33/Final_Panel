@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.basasa.incrs.AnswerView.View_Post_Answers;
+import com.basasa.incrs.NDS.SreviceClass;
 import com.basasa.incrs.R;
 import com.basasa.incrs.Recyclerview.DividerItemDecoration;
 import com.basasa.incrs.Recyclerview.RecyclerTouchListener;
@@ -44,6 +46,8 @@ public class Lecturer_Post extends Fragment implements View.OnClickListener{
     private RecyclerView recyclerView;
     private Lecturer_PostAdapter mAdapter;
     private SQLiteDatabase storeData;
+    private Handler handler=new Handler();
+    private Runnable runnable;
     String s;
     int x;
     @Nullable
@@ -84,6 +88,16 @@ public class Lecturer_Post extends Fragment implements View.OnClickListener{
         }));
 
         getDataFromDB1();
+
+        runnable=new Runnable() {
+            @Override
+            public void run() {
+                getDataFromDB1();
+                handler.postDelayed(this,3000);
+            }
+        };
+        runnable.run();
+
     }
     @Override
     public void onResume() {
@@ -177,10 +191,11 @@ public class Lecturer_Post extends Fragment implements View.OnClickListener{
             public void onClick(DialogInterface dialog, int which) {
                 Student_Post student_post=new Student_Post();
             if (x==1){
-
                 student_post.sendMsg(id+"#"+question.getText().toString().trim());
+                //student_post.sendMsg(id+"#"+question.getText().toString().trim());
             }
             else if (x==2){
+                //student_post.sendMsg(id+"#"+s);
                 student_post.sendMsg(id+"#"+s);
             }
             }

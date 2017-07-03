@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -28,7 +29,9 @@
         <activity android:name=".Other.Help" />
         <activity android:name=".Other.Files_Shared" />
         <activity android:name=".Drawer.Contact_Us" />
-        <activity android:name=".AnswerView.View_Post_Answers"></activity>
+        <activity android:name=".AnswerView.View_Post_Answers" />
+
+        <service android:name=".NDS.SreviceClass"/>
     </application>
 
 </manifest>

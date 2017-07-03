@@ -1,9 +1,11 @@
 package com.basasa.incrs.posts;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -11,6 +13,8 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -28,12 +32,17 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.basasa.incrs.AnswerView.View_Post_Answers;
 import com.basasa.incrs.Message.DataBaseHelper;
 import com.basasa.incrs.Message.MyCustomAdapter;
 import com.basasa.incrs.NDS.ChatThread;
+import com.basasa.incrs.NDS.Client;
 import com.basasa.incrs.NDS.DiscoveryThread;
+import com.basasa.incrs.NDS.SreviceClass;
+import com.basasa.incrs.NDS.savethread;
+import com.basasa.incrs.Other.fileThread;
 import com.basasa.incrs.R;
 import com.basasa.incrs.Recyclerview.DividerItemDecoration;
 import com.basasa.incrs.Recyclerview.RecyclerTouchListener;
@@ -41,10 +50,13 @@ import com.basasa.incrs.Recyclerview.Student_Model;
 import com.basasa.incrs.Recyclerview.Student_PostAdapter;
 
 
-
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -58,9 +70,9 @@ public class Student_Post extends Fragment  {
     private Student_PostAdapter mAdapter;
     private SQLiteDatabase storeData;
     FloatingActionButton fab;
-   int port;
+
     int check=0;
-    InetAddress host;
+
     //dialog
     private ArrayList<String> arrayList;
     private MyCustomAdapter adapter;
@@ -68,7 +80,11 @@ public class Student_Post extends Fragment  {
     private ChatThread chat;
     //ProgressDialog dialog=null;
     private static final int REQUEST_CODE = 1;
-    Handler mHandler = new Handler();
+    private Handler handler=new Handler();
+    private Runnable runnable;
+    PrintWriter out=null;
+    BufferedReader in=null;
+  private Client client=new Client();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,7 +104,7 @@ public class Student_Post extends Fragment  {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView = (RecyclerView)view.findViewById(R.id.student_posts);
+        recyclerView = (RecyclerView) view.findViewById(R.id.student_posts);
         postList = new ArrayList<Student_Model>();
         mAdapter = new Student_PostAdapter(postList);
         //dialog = new ProgressDialog(getContext());
@@ -110,58 +126,99 @@ public class Student_Post extends Fragment  {
 //                intent.putExtra("id",post.getId());
 //                startActivity(intent);
 
-                DialogBoxAnswer(post.getId(),post.getQuestion());
+                DialogBoxAnswer(post.getId(), post.getQuestion());
 
             }
+
+
             @Override
             public void onLongClick(View view, int position) {
                 Student_Model post = postList.get(position);
 
-                Intent intent=new Intent(getActivity(), View_Post_Answers.class);
+                Intent intent = new Intent(getActivity(), View_Post_Answers.class);
                 intent.putExtra("message", post.getQuestion());
-                intent.putExtra("id",post.getId());
+                intent.putExtra("id", post.getId());
                 startActivity(intent);
             }
         }));
         //dialog
-        dataBaseHelper2=new DataBaseHelper(getContext());
+        dataBaseHelper2 = new DataBaseHelper(getContext());
+
 
         Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
         discoveryThread.start();
 
+//        Thread filethread = new Thread(fileThread.getInstance());
+//        filethread.start();
         //fetch();
         getDataFromDB1();
 
-        DataBaseHelper dataBaseHelper=new DataBaseHelper(getContext());
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(getContext());
         dataBaseHelper.fetch();
         threadconnection();
 
-        new Thread(new Runnable() {
+
+      runnable=new Runnable() {
+          @Override
+          public void run() {
+              getDataFromDB1();
+              handler.postDelayed(this,3000);
+          }
+      };
+      runnable.run();
+
+        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                // TODO Auto-generated method stub
-                while (true) {
-                    try {
-                        Thread.sleep(10000);
-                        mHandler.post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                // TODO Auto-generated method stub
-                                // Write your code here to update the UI.
-                             //new connectTask2().execute("");
-                            }
-                        });
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                    }
-                }
+                ///service
+                getContext().startService(new Intent(getContext(),SreviceClass.class));
+                doBindService();
             }
-        }).start();
+        },3000);
+
+
+
     }
 
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        //EDITED PART
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // TODO Auto-generated method stub
+            mBoundService = ((SreviceClass.LocalBinder)service).getService();
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            // TODO Auto-generated method stub
+            mBoundService = null;
+        }
+
+    };
+
+
+    private void doBindService() {
+      getContext(). bindService(new Intent(getContext(), SreviceClass.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+        if(mBoundService!=null){
+            mBoundService.IsBoundable();
+        }
+    }
+    Boolean mIsBound=false;
+    SreviceClass mBoundService;
+    private void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+           getContext(). unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+
     void DialogBox(){
-        new connectTask().execute("");
+        //new connectTask().execute("");
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.add_question_dialog, null);
@@ -169,22 +226,33 @@ public class Student_Post extends Fragment  {
         final ListView mList =(ListView)dialogView.findViewById(R.id.list_questions);
         final Button btnCancel=(Button)dialogView.findViewById(R.id.cancel);
         final Button btnSave=(Button)dialogView.findViewById(R.id.save);
-        arrayList = new ArrayList<String>();
-        adapter = new MyCustomAdapter(getContext(), arrayList);
-        //builder.setCancelable(false);
-        mList.setAdapter(adapter);
+
+//        arrayList = new ArrayList<String>();
+//        adapter = new MyCustomAdapter(getContext(), arrayList);
+//        //builder.setCancelable(false);
+//        mList.setAdapter(adapter);
         builder.setView(dialogView);
         btnCancel.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-           sendMessage(question.getText().toString().trim());
+
+           //sendMessage(question.getText().toString().trim());
            }
        });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage(question.getText().toString().trim());
+
+            if (mBoundService!=null){
+                mBoundService.sendMessage(question.getText().toString().trim());
                 question.setText("");
+            }
+               // sendMessage(question.getText().toString().trim());
+
+
+                else{
+                System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+            }
             }
         });
         builder.create();
@@ -206,7 +274,9 @@ public class Student_Post extends Fragment  {
         builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              sendMsg(id+"#"+question.getText().toString().trim());
+                if (mBoundService!=null) {
+                    mBoundService.sendMessage(id + "#" + question.getText().toString().trim());
+                }
             }
         });
         builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -219,6 +289,7 @@ public class Student_Post extends Fragment  {
         builder.show();
     }
     public void StoreDb(String messageToSave){
+        Toast.makeText(getContext(),"You Have Received New Post",Toast.LENGTH_LONG);
         try {
             if (messageToSave.contains("ENTER") || messageToSave.contains("/") || messageToSave.startsWith("*")) {
                 return;
@@ -257,7 +328,7 @@ public class Student_Post extends Fragment  {
                     publishProgress(message);
                 }
             });
-            chat.run();
+//            chat.run();
 
             return null;
         }
@@ -294,26 +365,10 @@ public class Student_Post extends Fragment  {
 //    }
 
     public void sendMsg(String message){
-        //add the text in the arrayList
-        //arrayList.add("c: " + message);
-
         //sends the message to the server
-        if (chat != null) {
-            chat.sendMsg(message);
+        if (mBoundService!=null){
+            mBoundService.sendMessage(message);
         }
-    }
-    public void sendMessage(String message){
-        //add the text in the arrayList
-        //arrayList.add("c: " + message);
-
-        //sends the message to the server
-        if (chat != null) {
-            chat.sendMsg(message);
-        }
-
-        //refresh the list
-        adapter.notifyDataSetChanged();
-
     }
     public void threadconnection(){
         check=1;
@@ -338,6 +393,11 @@ public class Student_Post extends Fragment  {
         super.onResume();
         getDataFromDB1();
         //threadconnection();
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        handler.removeCallbacks(runnable);
     }
     @Override
     public void onPause() {
